@@ -376,8 +376,9 @@ class MainWindow(QMainWindow):
             # 操作按钮
             ops = QWidget()
             lo = QHBoxLayout(ops)
-            lo.setContentsMargins(2, 4, 2, 4)
-            lo.setSpacing(4)
+            lo.setContentsMargins(0, 2, 0, 2)
+            lo.setSpacing(2)
+            lo.setAlignment(Qt.AlignCenter)
 
             if st == 'done':
                 b1 = self._mk_btn("查看", '#fff', '#1d9bf0', '#1d9bf0', small=True)
@@ -393,10 +394,6 @@ class MainWindow(QMainWindow):
                 b1 = self._mk_btn("重采", '#f59e0b', small=True)
                 b1.clicked.connect(lambda _, k=kw: self.retry_one(k))
                 lo.addWidget(b1)
-            elif st == 'pending':
-                lo.addWidget(QLabel("—"))
-            elif st == 'collecting':
-                lo.addWidget(QLabel("采集中..."))
 
             if st != 'collecting':
                 bd = self._mk_btn("删除", '#fff', '#f4212e', '#f4212e', small=True)
@@ -557,7 +554,8 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    app.setFont(QFont("Microsoft YaHei", 10))
+    app.setFont(QFont("Microsoft YaHei", 11))
+    app.setStyleSheet("QTableWidget{font-size:12px;} QHeaderView{font-size:12px;}")
     w = MainWindow()
     w.show()
     sys.exit(app.exec_())
