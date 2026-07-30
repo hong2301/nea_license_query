@@ -9,7 +9,7 @@ from datetime import datetime
 import requests
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt, pyqtSignal, QObject
-from PyQt5.QtGui import QFont, QColor, QPixmap, QIcon, QPainter
+from PyQt5.QtGui import QFont, QColor, QIcon
 
 # ==================== 配置 ====================
 BASE_URL = "https://zzxy.nea.gov.cn/public/login-service/login/xkgsNew"
@@ -118,11 +118,11 @@ class MainWindow(QMainWindow):
         else:
             b.setStyleSheet(
                 f"QPushButton{{background:{bg};color:{fg};border:none;"
-                f"padding:10px 24px;border-radius:5px;font-weight:600;font-size:30px;min-width:80px}}"
+                f"padding:10px 24px;border-radius:5px;font-weight:600;font-size:27px;min-width:80px}}"
                 f"QPushButton:hover{{opacity:0.85}}"
                 f"QPushButton:disabled{{background:#ccc;color:#888}}"
             )
-            b.setFixedHeight(66)
+            b.setFixedHeight(60)
         return b
 
     def _build(self):
@@ -136,12 +136,12 @@ class MainWindow(QMainWindow):
         bar = QHBoxLayout()
         bar.setSpacing(8)
         bar.addWidget(QLabel("关键词"))
-        bar.itemAt(0).widget().setStyleSheet("font-size:30px;")
+        bar.itemAt(0).widget().setStyleSheet("font-size:27px;")
         self.kw_input = QLineEdit()
         self.kw_input.setPlaceholderText("输入后回车添加")
         self.kw_input.setFixedWidth(400)
-        self.kw_input.setFixedHeight(60)
-        self.kw_input.setStyleSheet("QLineEdit{font-size:30px;padding:4px 10px;}")
+        self.kw_input.setFixedHeight(54)
+        self.kw_input.setStyleSheet("QLineEdit{font-size:27px;padding:4px 10px;}")
         self.kw_input.returnPressed.connect(self.add_keyword)
         bar.addWidget(self.kw_input)
 
@@ -577,23 +577,9 @@ def main():
     app = QApplication(sys.argv)
     f_ = QFont("Microsoft YaHei"); f_.setPixelSize(24); app.setFont(f_)
     # 程序图标
-    icon_pix = QPixmap(64, 64)
-    icon_pix.fill(Qt.transparent)
-    p = QPainter(icon_pix)
-    p.setRenderHint(QPainter.Antialiasing)
-    # 圆角深蓝底
-    p.setBrush(QColor('#1D6FB0'))
-    p.setPen(Qt.NoPen)
-    p.drawRoundedRect(4, 4, 56, 56, 12, 12)
-    # 白色 "能源" 文字
-    f = QFont('Microsoft YaHei')
-    f.setPixelSize(22)
-    f.setBold(True)
-    p.setFont(f)
-    p.setPen(QColor('#FFFFFF'))
-    p.drawText(icon_pix.rect(), Qt.AlignCenter, '能源')
-    p.end()
-    app.setWindowIcon(QIcon(icon_pix))
+    icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'icon.png')
+    if os.path.exists(icon_path):
+        app.setWindowIcon(QIcon(icon_path))
     w = MainWindow()
     w.show()
     sys.exit(app.exec_())
