@@ -180,7 +180,7 @@ class MainWindow(QMainWindow):
         self.task_table.setColumnWidth(2, 80)
         self.task_table.setColumnWidth(3, 200)
         self.task_table.horizontalHeader().setStretchLastSection(False)
-        self.task_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+        self.task_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Stretch)
         self.task_table.setSelectionMode(QTableWidget.NoSelection)
         self.task_table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.task_table.verticalHeader().setVisible(False)
