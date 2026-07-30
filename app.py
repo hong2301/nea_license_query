@@ -219,9 +219,15 @@ class MainWindow(QMainWindow):
 
     def clear_all(self):
         if self.collecting:
-            QMessageBox.warning(self, "提示", "采集进行中，无法清空")
+            QMessageBox.warning(self, "提示", "采集中，无法清空")
             return
-        if QMessageBox.question(self, "确认", "清空所有关键词？") != QMessageBox.Yes:
+        box = QMessageBox(self)
+        box.setWindowTitle("确认")
+        box.setText("清空所有关键词？")
+        yes_btn = box.addButton("是", QMessageBox.YesRole)
+        no_btn = box.addButton("否", QMessageBox.NoRole)
+        box.exec_()
+        if box.clickedButton() != yes_btn:
             return
         self.keywords.clear()
         self.tasks.clear()
