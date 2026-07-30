@@ -111,13 +111,13 @@ class MainWindow(QMainWindow):
             color = fg if fg and fg != '#fff' else bg
             b.setStyleSheet(
                 f"QPushButton{{background:transparent;color:{color};border:none;"
-                f"padding:2px 8px;font-size:13px;}}"
+                f"padding:2px 10px;font-size:15px;}}"
                 f"QPushButton:hover{{text-decoration:underline}}"
             )
             b.setCursor(Qt.PointingHandCursor)
         else:
-            p = '8px 20px'
-            fs = 15
+            p = '10px 24px'
+            fs = 18
             mw = 80
             border_style = f'border:1.5px solid {border};' if border else 'border:none;'
             b.setStyleSheet(
@@ -126,7 +126,7 @@ class MainWindow(QMainWindow):
                 f"QPushButton:hover{{opacity:0.85}}"
                 f"QPushButton:disabled{{background:#ccc;color:#888}}"
             )
-            b.setFixedHeight(40)
+            b.setFixedHeight(44)
         return b
 
     def _build(self):
@@ -143,8 +143,8 @@ class MainWindow(QMainWindow):
         self.kw_input = QLineEdit()
         self.kw_input.setPlaceholderText("输入后回车添加")
         self.kw_input.setFixedWidth(200)
-        self.kw_input.setFixedHeight(38)
-        self.kw_input.setStyleSheet("QLineEdit{font-size:13px;padding:4px 8px;}")
+        self.kw_input.setFixedHeight(44)
+        self.kw_input.setStyleSheet("QLineEdit{font-size:14px;padding:4px 10px;}")
         self.kw_input.returnPressed.connect(self.add_keyword)
         bar.addWidget(self.kw_input)
 
@@ -401,7 +401,7 @@ class MainWindow(QMainWindow):
                 lo.addWidget(bd)
 
             t.setCellWidget(i, 3, ops)
-            t.setRowHeight(i, 42)
+            t.setRowHeight(i, 48)
 
     # ==================== 预览 ====================
     def view_data(self, kw):
@@ -554,8 +554,8 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    app.setFont(QFont("Microsoft YaHei", 12))
-    app.setStyleSheet("QTableWidget{font-size:13px;} QHeaderView{font-size:13px;}")
+    app.setFont(QFont("Microsoft YaHei", 14))
+    app.setStyleSheet("QTableWidget{font-size:15px;} QHeaderView{font-size:15px;}")
     w = MainWindow()
     w.show()
     sys.exit(app.exec_())
