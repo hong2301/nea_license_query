@@ -116,8 +116,8 @@ class MainWindow(QMainWindow):
             )
             b.setCursor(Qt.PointingHandCursor)
         else:
-            p = '10px 24px'
-            fs = 18
+            p = '10px 28px'
+            fs = 20
             mw = 80
             border_style = f'border:1.5px solid {border};' if border else 'border:none;'
             b.setStyleSheet(
@@ -126,7 +126,7 @@ class MainWindow(QMainWindow):
                 f"QPushButton:hover{{opacity:0.85}}"
                 f"QPushButton:disabled{{background:#ccc;color:#888}}"
             )
-            b.setFixedHeight(44)
+            b.setFixedHeight(48)
         return b
 
     def _build(self):
@@ -143,7 +143,7 @@ class MainWindow(QMainWindow):
         self.kw_input = QLineEdit()
         self.kw_input.setPlaceholderText("输入后回车添加")
         self.kw_input.setFixedWidth(200)
-        self.kw_input.setFixedHeight(44)
+        self.kw_input.setFixedHeight(48)
         self.kw_input.setStyleSheet("QLineEdit{font-size:14px;padding:4px 10px;}")
         self.kw_input.returnPressed.connect(self.add_keyword)
         bar.addWidget(self.kw_input)
