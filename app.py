@@ -229,7 +229,7 @@ class MainWindow(QMainWindow):
         # 支持任意分隔符切分：空格、逗号、顿号、分号等
         import re
         parts = re.split(r'[\s,，、;；]+', raw)
-        parts = [p.strip() for p in parts if p.strip()]
+        parts = list(dict.fromkeys(p.strip() for p in parts if p.strip()))  # 去重保序
         if not parts:
             QMessageBox.warning(self, "提示", "输入错误")
             return
