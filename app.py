@@ -87,7 +87,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("能源局许可查询器")
-        self.setGeometry(100, 100, 1150, 750)
+        self.setGeometry(100, 100, 1300, 750)
         self.setMinimumSize(900, 500)
 
         self.keywords = []
@@ -175,10 +175,10 @@ class MainWindow(QMainWindow):
         # 关键词表格
         self.task_table = QTableWidget(0, 4)
         self.task_table.setHorizontalHeaderLabels(['关键词', '状态', '数量', '操作'])
-        self.task_table.setColumnWidth(0, 180)
-        self.task_table.setColumnWidth(1, 120)
+        self.task_table.setColumnWidth(0, 150)
+        self.task_table.setColumnWidth(1, 150)
         self.task_table.setColumnWidth(2, 80)
-        self.task_table.setColumnWidth(3, 220)
+        self.task_table.setColumnWidth(3, 200)
         self.task_table.horizontalHeader().setStretchLastSection(False)
         self.task_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.task_table.setSelectionMode(QTableWidget.NoSelection)
