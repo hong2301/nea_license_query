@@ -107,6 +107,7 @@ class MainWindow(QMainWindow):
     def _mk_btn(self, text, bg, fg='#fff', border=None, small=False):
         b = QPushButton(text)
         if small:
+            color = fg if fg and fg != '#fff' else bg
             b.setStyleSheet(
                 f"QPushButton{{background:transparent;color:{color};border:none;"
                 f"padding:4px 10px;font-size:16px;}}"
