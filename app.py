@@ -19,6 +19,39 @@ SM2_PUBLIC_KEY = (
 STATUS_L = {'pending':'待处理','collecting':'采集中','done':'采集完毕','failed':'采集失败'}
 STATUS_C = {'pending':'#8899a6','collecting':'#1d9bf0','done':'#00ba7c','failed':'#f4212e'}
 
+# 中文字段映射（按显示顺序）
+FIELD_MAP = [
+    ('entername',       '企业名称'),
+    ('legalname',       '申请人名称'),
+    ('licstate',        '许可证书状态'),
+    ('socialcreditno',  '统一社会信用代码'),
+    ('entertype',       '许可证类别'),
+    ('csgrade',         '承试等级'),
+    ('cxgrade',         '承修等级'),
+    ('czgrade',         '承装等级'),
+    ('licenceno',       '许可证编号'),
+    ('licencedate',     '许可证核发日期'),
+    ('licvalidstart',   '有效起始日期'),
+    ('licvalidend',     '有效到期日期'),
+    ('acceptorgname',   '许可证核发机关'),
+]
+FIELD_KEYS = [k for k, _ in FIELD_MAP]
+FIELD_NAMES = [n for _, n in FIELD_MAP]
+
+# 加载字典文件
+DICT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dict.json')
+def _load_dict():
+    if os.path.exists(DICT_FILE):
+        with open(DICT_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {}
+CODE_DICT = _load_dict()
+
+def _code_lookup(category, code):
+    """查字典：category='entertype'|'licstate'，返回中文或原始值"""
+    m = CODE_DICT.get(category, {})
+    return m.get(str(code), str(code)) if code is not None else '-'
+
 
 def encrypt(data: str) -> str:
     d = os.path.dirname(os.path.abspath(__file__))
@@ -75,11 +108,11 @@ class MainWindow(QMainWindow):
 
     def _mk_btn(self, text, bg, fg='#fff', border=None, small=False):
         b = QPushButton(text)
-        p = '4px 12px' if small else '8px 18px'
+        p = '5px 14px' if small else '8px 18px'
         border_style = f'border:1.5px solid {border};' if border else 'border:none;'
         b.setStyleSheet(
             f"QPushButton{{background:{bg};color:{fg};{border_style}"
-            f"padding:{p};border-radius:4px;font-weight:600;font-size:{11 if small else 13}px}}"
+            f"padding:{p};border-radius:5px;font-weight:600;font-size:{12 if small else 13}px;min-width:{52 if small else 80}px}}"
             f"QPushButton:hover{{opacity:0.85}}"
             f"QPushButton:disabled{{background:#ccc;color:#888}}"
         )
@@ -102,9 +135,9 @@ class MainWindow(QMainWindow):
         self.kw_input.returnPressed.connect(self.add_keyword)
         bar.addWidget(self.kw_input)
 
-        btn_add = self._mk_btn("添加", '#fff', '#1d9bf0', '#1d9bf0', small=True)
-        btn_add.clicked.connect(self.add_keyword)
-        bar.addWidget(btn_add)
+        self.btn_add = self._mk_btn("添加", '#fff', '#1d9bf0', '#1d9bf0')
+        self.btn_add.clicked.connect(self.add_keyword)
+        bar.addWidget(self.btn_add)
 
         bar.addSpacing(12)
 
@@ -119,9 +152,9 @@ class MainWindow(QMainWindow):
 
         bar.addStretch()
 
-        btn_clear = self._mk_btn("清空", '#fff', '#f4212e', '#f4212e', small=True)
-        btn_clear.clicked.connect(self.clear_all)
-        bar.addWidget(btn_clear)
+        self.btn_clear = self._mk_btn("清空", '#fff', '#f4212e', '#f4212e')
+        self.btn_clear.clicked.connect(self.clear_all)
+        bar.addWidget(self.btn_clear)
 
         root.addLayout(bar)
 
@@ -132,14 +165,15 @@ class MainWindow(QMainWindow):
         # 关键词表格
         self.task_table = QTableWidget(0, 4)
         self.task_table.setHorizontalHeaderLabels(['关键词', '状态', '数量', '操作'])
-        self.task_table.setColumnWidth(0, 200)
-        self.task_table.setColumnWidth(1, 100)
-        self.task_table.setColumnWidth(2, 80)
+        self.task_table.setColumnWidth(0, 180)
+        self.task_table.setColumnWidth(1, 90)
+        self.task_table.setColumnWidth(2, 70)
         self.task_table.horizontalHeader().setStretchLastSection(True)
         self.task_table.setSelectionMode(QTableWidget.NoSelection)
         self.task_table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.task_table.verticalHeader().setVisible(False)
         self.task_table.setShowGrid(False)
+        self.task_table.setStyleSheet("QTableWidget{gridline-color:#e5e7eb;}")
         self.task_table.setAlternatingRowColors(True)
         # 居中列头
         for col in range(4):
@@ -165,6 +199,7 @@ class MainWindow(QMainWindow):
         self.data_table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.data_table.verticalHeader().setVisible(False)
         self.data_table.setShowGrid(False)
+        self.data_table.setStyleSheet("QTableWidget{gridline-color:#e5e7eb;}")
         pv.addWidget(self.data_table)
 
         self.preview_box.setVisible(False)
@@ -210,9 +245,7 @@ class MainWindow(QMainWindow):
     # ==================== 采集 ====================
     def toggle_collect(self):
         if self.collecting:
-            self.paused = True
-            self._update_buttons()
-            return
+            return  # 采集中不可点击
         pending = [k for k in self.keywords
                    if self.tasks.get(k, {}).get('status') in ('pending', 'failed')]
         if not pending:
@@ -258,6 +291,20 @@ class MainWindow(QMainWindow):
         self.collecting = False; self.paused = False
         self._update_buttons()
 
+    def _format_cell(self, key, row):
+        """格式化单元格：编码转中文 + entertype=4 拼等级"""
+        val = str(row.get(key, '') or '')
+        if key == 'licstate':
+            return _code_lookup('licstate', val)
+        if key == 'entertype':
+            if str(row.get('entertype', '')) == '4':
+                cz = row.get('czgrade', '') or ''
+                cx = row.get('cxgrade', '') or ''
+                cs = row.get('csgrade', '') or ''
+                return f'承装{cz}级 承修{cx}级 承试{cs}级'
+            return _code_lookup('entertype', val)
+        return val
+
     def retry_one(self, kw):
         if self.collecting: return
         self.tasks[kw] = {'status': 'pending', 'count': 0, 'data': None, 'error': None}
@@ -273,12 +320,7 @@ class MainWindow(QMainWindow):
         except ImportError: QMessageBox.critical(self, "错误", "pip install openpyxl"); return
         path, _ = QFileDialog.getSaveFileName(self, "导出", f"{kw}.xlsx", "Excel (*.xlsx)")
         if not path: return
-        wb = openpyxl.Workbook(); ws = wb.active
-        keys = list(data[0].keys())
-        for ci, k in enumerate(keys, 1): ws.cell(1, ci, k).font = openpyxl.styles.Font(bold=True)
-        for ri, row in enumerate(data, 2):
-            for ci, k in enumerate(keys, 1): ws.cell(ri, ci, row.get(k, ''))
-        wb.save(path)
+        self._write_xlsx(path, data, kw)
         QMessageBox.information(self, "提示", "导出成功")
 
     # ==================== 渲染 ====================
@@ -291,7 +333,9 @@ class MainWindow(QMainWindow):
             cnt = info.get('count', 0)
             cnt_s = f"{cnt:,}" if st == 'done' else ('...' if st == 'collecting' else '—')
 
-            t.setItem(i, 0, QTableWidgetItem(kw))
+            k0 = QTableWidgetItem(kw)
+            k0.setTextAlignment(Qt.AlignCenter)
+            t.setItem(i, 0, k0)
             si = QTableWidgetItem(STATUS_L.get(st, st))
             si.setForeground(QColor(STATUS_C.get(st, '#000')))
             si.setTextAlignment(Qt.AlignCenter)
@@ -330,9 +374,8 @@ class MainWindow(QMainWindow):
                 bd.clicked.connect(lambda _, k=kw: self.remove_kw(k))
                 lo.addWidget(bd)
 
-            lo.addStretch()
             t.setCellWidget(i, 3, ops)
-            t.setRowHeight(i, 38)
+            t.setRowHeight(i, 42)
 
     # ==================== 预览 ====================
     def view_data(self, kw):
@@ -348,15 +391,17 @@ class MainWindow(QMainWindow):
 
         dt = self.data_table
         dt.clear()
-        keys = list(data[0].keys())
-        dt.setColumnCount(len(keys))
-        dt.setHorizontalHeaderLabels(keys)
+        dt.setColumnCount(len(FIELD_NAMES))
+        dt.setHorizontalHeaderLabels(FIELD_NAMES)
         dt.setRowCount(min(len(data), 500))
         for ri, row in enumerate(data[:500]):
-            for ci, k in enumerate(keys):
-                dt.setItem(ri, ci, QTableWidgetItem(str(row.get(k, ''))))
-        for i in range(len(keys)):
-            dt.setColumnWidth(i, 160)
+            for ci, (key, _) in enumerate(FIELD_MAP):
+                val = self._format_cell(key, row)
+                dt.setItem(ri, ci, QTableWidgetItem(val))
+        dt.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        for ri in range(min(len(data), 500)):
+            for ci in range(len(FIELD_NAMES)):
+                dt.item(ri, ci).setTextAlignment(Qt.AlignCenter)
         if len(data) > 500:
             dt.setRowCount(501)
             dt.setItem(500, 0, QTableWidgetItem(f'... 仅显示前 500 条，共 {len(data):,} 条'))
@@ -395,31 +440,18 @@ class MainWindow(QMainWindow):
         halign = Alignment(horizontal='center', vertical='center')
         bd = Border(left=Side('thin'), right=Side('thin'), top=Side('thin'), bottom=Side('thin'))
 
-        def fill(ws, rows, kw=''):
-            if not rows: return
-            keys = list(rows[0].keys()) + (['搜索关键词'] if kw else [])
-            for ci, k in enumerate(keys, 1):
-                c = ws.cell(1, ci, k)
-                c.font, c.fill, c.alignment, c.border = hf, hfill, halign, bd
-            for ri, row in enumerate(rows, 2):
-                for ci, k in enumerate(keys, 1):
-                    val = row.get(k, kw) if k == '搜索关键词' else row.get(k, '')
-                    ws.cell(ri, ci, val).border = bd
-            for ci in range(1, len(keys) + 1):
-                ws.column_dimensions[openpyxl.utils.get_column_letter(ci)].width = 18
-
         if clicked == merge_btn:
             ws = wb.active; ws.title = '全部数据'
             all_data = []
             for k in done:
                 for row in self.tasks[k]['data']:
                     r = dict(row); r['搜索关键词'] = k; all_data.append(r)
-            fill(ws, all_data)
+            self._write_xlsx_sheet(ws, all_data, add_kw_col=True)
             name = '资管局数据_导出.xlsx'
         else:
             for k in done:
                 ws = wb.create_sheet(title=k[:31])
-                fill(ws, self.tasks[k]['data'], k)
+                self._write_xlsx_sheet(ws, self.tasks[k]['data'])
             if 'Sheet' in wb.sheetnames and len(wb.sheetnames) > 1:
                 del wb['Sheet']
             name = '资管局数据_分文件导出.xlsx'
@@ -429,6 +461,48 @@ class MainWindow(QMainWindow):
             wb.save(path)
             QMessageBox.information(self, "提示", f"已导出到:\n{path}")
 
+    def _write_xlsx(self, path, data, kw=''):
+        """写入 xlsx 文件"""
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        self._write_xlsx_sheet(ws, data, add_kw_col=bool(kw))
+        wb.save(path)
+
+    def _write_xlsx_sheet(self, ws, rows, add_kw_col=False):
+        """填充一个 sheet（使用中文字段名）"""
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+        if not rows:
+            return
+        hf = Font(bold=True, color='FFFFFF', size=11)
+        hfill = PatternFill(start_color='1D9BF0', end_color='1D9BF0', fill_type='solid')
+        halign = Alignment(horizontal='center', vertical='center')
+        bd = Border(left=Side('thin'), right=Side('thin'), top=Side('thin'), bottom=Side('thin'))
+
+        # 构建表头
+        out_keys = FIELD_KEYS.copy()
+        out_names = FIELD_NAMES.copy()
+        if add_kw_col:
+            out_keys.append('搜索关键词')
+            out_names.append('搜索关键词')
+
+        for ci, name in enumerate(out_names, 1):
+            c = ws.cell(1, ci, name)
+            c.font, c.fill, c.alignment, c.border = hf, hfill, halign, bd
+
+        for ri, row in enumerate(rows, 2):
+            for ci, key in enumerate(out_keys, 1):
+                if key == '搜索关键词':
+                    val = row.get(key, '')
+                else:
+                    val = self._format_cell(key, row)
+                ws.cell(ri, ci, val).border = bd
+
+        for ci in range(1, len(out_names) + 1):
+            ws.column_dimensions[openpyxl.utils.get_column_letter(ci)].width = 20
+
     def export_single(self):
         if self.current_view:
             self.export_one(self.current_view)
@@ -436,22 +510,20 @@ class MainWindow(QMainWindow):
     # ==================== 按钮 ====================
     def _update_buttons(self):
         if self.collecting:
-            self.btn_start.setText("⏸ 采集中")
-            self.btn_start.setStyleSheet(
-                "QPushButton{background:#f59e0b;color:#fff;padding:8px 18px;border:none;border-radius:4px;font-weight:600}"
-                "QPushButton:hover{opacity:0.85}"
-            )
+            self.btn_start.setText("采集中...")
+            self.btn_start.setEnabled(False)
+            self.btn_add.setEnabled(False)
+            self.btn_clear.setEnabled(False)
+            self.kw_input.setEnabled(False)
             self.btn_export.setEnabled(False)
         else:
             has_pending = any(self.tasks.get(k, {}).get('status') in ('pending', 'failed') for k in self.keywords)
             has_done = any(self.tasks.get(k, {}).get('status') == 'done' for k in self.keywords)
             self.btn_start.setText("▶ 采集")
-            self.btn_start.setStyleSheet(
-                "QPushButton{background:#1d9bf0;color:#fff;padding:8px 18px;border:none;border-radius:4px;font-weight:600}"
-                "QPushButton:hover{opacity:0.85}"
-                "QPushButton:disabled{background:#ccc;color:#888}"
-            )
             self.btn_start.setEnabled(has_pending)
+            self.btn_add.setEnabled(True)
+            self.btn_clear.setEnabled(True)
+            self.kw_input.setEnabled(True)
             self.btn_export.setEnabled(has_done)
 
 
