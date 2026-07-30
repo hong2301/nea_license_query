@@ -362,9 +362,10 @@ class MainWindow(QMainWindow):
         if not data: return
         try: import openpyxl
         except ImportError: QMessageBox.critical(self, "错误", "pip install openpyxl"); return
-        default_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'export_{datetime.now().strftime("%Y%m%d_%H%M%S")}')
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        default_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'export_{ts}')
         os.makedirs(default_dir, exist_ok=True)
-        default_path = os.path.join(default_dir, f'{kw}.xlsx')
+        default_path = os.path.join(default_dir, f'{kw}_{ts}.xlsx')
         path, _ = QFileDialog.getSaveFileName(self, "导出", default_path, "Excel (*.xlsx)")
         if not path: return
         self._write_xlsx(path, data, kw)
@@ -484,9 +485,10 @@ class MainWindow(QMainWindow):
         wb = openpyxl.Workbook()
 
         if clicked == merge_btn:
-            default_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'export_{datetime.now().strftime("%Y%m%d_%H%M%S")}')
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            default_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'export_{ts}')
             os.makedirs(default_dir, exist_ok=True)
-            default_path = os.path.join(default_dir, '资管局数据_导出.xlsx')
+            default_path = os.path.join(default_dir, f'资管局数据_导出_{ts}.xlsx')
             path, _ = QFileDialog.getSaveFileName(self, "保存", default_path, "Excel (*.xlsx)")
             if path:
                 ws = wb.active; ws.title = '全部数据'
@@ -498,14 +500,15 @@ class MainWindow(QMainWindow):
                 wb.save(path)
                 QMessageBox.information(self, "提示", f"已导出到:\n{path}")
         else:
-            default_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'export_{datetime.now().strftime("%Y%m%d_%H%M%S")}')
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            default_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'export_{ts}')
             os.makedirs(default_dir, exist_ok=True)
             folder = QFileDialog.getExistingDirectory(self, "选择导出文件夹", default_dir)
             if not folder: return
             count = 0
             for k in done:
                 safe_name = k.replace('/', '_').replace('\\', '_').replace(':', '_')[:50]
-                fpath = os.path.join(folder, f'{safe_name}.xlsx')
+                fpath = os.path.join(folder, f'{safe_name}_{ts}.xlsx')
                 self._write_xlsx(fpath, self.tasks[k]['data'])
                 count += 1
             QMessageBox.information(self, "提示", f"已导出 {count} 个文件到:\n{folder}")
