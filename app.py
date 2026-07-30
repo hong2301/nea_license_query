@@ -9,7 +9,7 @@ from datetime import datetime
 import requests
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt, pyqtSignal, QObject
-from PyQt5.QtGui import QFont, QColor, QPixmap, QIcon
+from PyQt5.QtGui import QFont, QColor, QPixmap, QIcon, QPainter
 
 # ==================== 配置 ====================
 BASE_URL = "https://zzxy.nea.gov.cn/public/login-service/login/xkgsNew"
@@ -577,8 +577,22 @@ def main():
     app = QApplication(sys.argv)
     f_ = QFont("Microsoft YaHei"); f_.setPixelSize(24); app.setFont(f_)
     # 程序图标
-    icon_pix = QPixmap(32, 32)
-    icon_pix.fill(QColor('#1D6FB0'))
+    icon_pix = QPixmap(64, 64)
+    icon_pix.fill(Qt.transparent)
+    p = QPainter(icon_pix)
+    p.setRenderHint(QPainter.Antialiasing)
+    # 圆角深蓝底
+    p.setBrush(QColor('#1D6FB0'))
+    p.setPen(Qt.NoPen)
+    p.drawRoundedRect(4, 4, 56, 56, 12, 12)
+    # 白色 "能源" 文字
+    f = QFont('Microsoft YaHei')
+    f.setPixelSize(22)
+    f.setBold(True)
+    p.setFont(f)
+    p.setPen(QColor('#FFFFFF'))
+    p.drawText(icon_pix.rect(), Qt.AlignCenter, '能源')
+    p.end()
     app.setWindowIcon(QIcon(icon_pix))
     w = MainWindow()
     w.show()
