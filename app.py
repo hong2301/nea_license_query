@@ -576,6 +576,10 @@ class MainWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     f_ = QFont("Microsoft YaHei"); f_.setPixelSize(24); app.setFont(f_)
+    # 程序图标
+    icon_pix = QPixmap(32, 32)
+    icon_pix.fill(QColor('#1D6FB0'))
+    app.setWindowIcon(QIcon(icon_pix))
     w = MainWindow()
     w.show()
     sys.exit(app.exec_())
