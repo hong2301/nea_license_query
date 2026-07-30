@@ -299,10 +299,14 @@ class MainWindow(QMainWindow):
             return _code_lookup('licstate', val)
         if key == 'entertype':
             if str(row.get('entertype', '')) == '4':
-                cz = row.get('czgrade', '') or ''
-                cx = row.get('cxgrade', '') or ''
-                cs = row.get('csgrade', '') or ''
-                return f'承装{cz}级 承修{cx}级 承试{cs}级'
+                GRADE_DESC = {'2': '110千伏以下', '3': '10千伏以下'}
+                parts = []
+                for gk, label in [('czgrade', '承装等级'), ('cxgrade', '承修等级'), ('csgrade', '承试等级')]:
+                    gv = str(row.get(gk, '') or '')
+                    if gv:
+                        desc = GRADE_DESC.get(gv, '')
+                        parts.append(f'{label}：{gv}（{desc}）' if desc else f'{label}：{gv}')
+                return '、'.join(parts)
             return _code_lookup('entertype', val)
         return val
 
