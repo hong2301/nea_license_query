@@ -47,10 +47,9 @@ CODE_DICT = _load_dict()
 
 def _code_lookup(category, code):
     """查字典：category='entertype'|'licstate'，返回中文或原始值"""
-    if code is None:
-        return '正常(null)'
     m = CODE_DICT.get(category, {})
-    return m.get(str(code), str(code))
+    s = str(code) if code is not None else 'null'
+    return m.get(s, s)
 
 
 def encrypt(data: str) -> str:
