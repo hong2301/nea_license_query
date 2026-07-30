@@ -47,8 +47,10 @@ CODE_DICT = _load_dict()
 
 def _code_lookup(category, code):
     """查字典：category='entertype'|'licstate'，返回中文或原始值"""
+    if code is None:
+        return '(null)'
     m = CODE_DICT.get(category, {})
-    return m.get(str(code), str(code)) if code is not None else '-'
+    return m.get(str(code), str(code))
 
 
 def encrypt(data: str) -> str:
@@ -333,7 +335,7 @@ class MainWindow(QMainWindow):
 
     def _format_cell(self, key, row):
         """格式化单元格：编码转中文 + entertype=4 拼等级"""
-        val = str(row.get(key, '') or '')
+        val = row.get(key)
         if key == 'licstate':
             return _code_lookup('licstate', val)
         if key == 'entertype':
@@ -345,7 +347,7 @@ class MainWindow(QMainWindow):
                         parts.append(f'{label}：{gv}')
                 return '、'.join(parts)
             return _code_lookup('entertype', val)
-        return val
+        return str(val) if val is not None else ''
 
     def retry_one(self, kw):
         if self.collecting: return
