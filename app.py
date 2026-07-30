@@ -194,7 +194,7 @@ class MainWindow(QMainWindow):
                 item.setTextAlignment(Qt.AlignCenter)
         splitter.addWidget(self.task_table)
         # 设置表格字体
-        tf = QFont("Microsoft YaHei", 16)
+        tf = QFont("Microsoft YaHei"); tf.setPixelSize(16)
         self.task_table.setFont(tf)
         self.task_table.horizontalHeader().setFont(tf)
 
@@ -219,7 +219,7 @@ class MainWindow(QMainWindow):
         pv.addWidget(self.data_table)
 
         self.preview_box.setVisible(False)
-        tf2 = QFont("Microsoft YaHei", 16)
+        tf2 = QFont("Microsoft YaHei"); tf2.setPixelSize(16)
         self.data_table.setFont(tf2)
         self.data_table.horizontalHeader().setFont(tf2)
         splitter.addWidget(self.preview_box)
@@ -370,16 +370,16 @@ class MainWindow(QMainWindow):
 
             k0 = QTableWidgetItem(kw)
             k0.setTextAlignment(Qt.AlignCenter)
-            k0.setFont(QFont("Microsoft YaHei", 16))
+            f_ = QFont("Microsoft YaHei"); f_.setPixelSize(16); k0.setFont(f_)
             t.setItem(i, 0, k0)
             si = QTableWidgetItem(STATUS_L.get(st, st))
             si.setForeground(QColor(STATUS_C.get(st, '#000')))
             si.setTextAlignment(Qt.AlignCenter)
-            si.setFont(QFont("Microsoft YaHei", 16))
+            f_ = QFont("Microsoft YaHei"); f_.setPixelSize(16); si.setFont(f_)
             t.setItem(i, 1, si)
             ci = QTableWidgetItem(cnt_s)
             ci.setTextAlignment(Qt.AlignCenter)
-            ci.setFont(QFont("Microsoft YaHei", 16))
+            f_ = QFont("Microsoft YaHei"); f_.setPixelSize(16); ci.setFont(f_)
             t.setItem(i, 2, ci)
 
             # 操作按钮
@@ -433,7 +433,7 @@ class MainWindow(QMainWindow):
             for ci, (key, _) in enumerate(FIELD_MAP):
                 val = self._format_cell(key, row)
                 item = QTableWidgetItem(val)
-                item.setFont(QFont("Microsoft YaHei", 16))
+                f_ = QFont("Microsoft YaHei"); f_.setPixelSize(16); item.setFont(f_)
                 item.setTextAlignment(Qt.AlignCenter)
                 dt.setItem(ri, ci, item)
         dt.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -563,7 +563,7 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    app.setFont(QFont("Microsoft YaHei", 14))
+    f_ = QFont("Microsoft YaHei"); f_.setPixelSize(14); app.setFont(f_)
     w = MainWindow()
     w.show()
     sys.exit(app.exec_())
