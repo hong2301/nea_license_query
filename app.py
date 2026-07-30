@@ -524,6 +524,11 @@ class MainWindow(QMainWindow):
 
     def _write_xlsx_sheet(self, ws, rows, add_kw_col=False):
         """填充一个 sheet（使用中文字段名）"""
+        self._write_xlsx_sheet_static(ws, rows, add_kw_col, self._format_cell)
+
+    @staticmethod
+    def _write_xlsx_sheet_static(ws, rows, add_kw_col=False, fmt=None):
+        """静态版本，fmt 是格式化函数 (key, row) -> str"""
         import openpyxl
         from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
         if not rows:
@@ -548,8 +553,14 @@ class MainWindow(QMainWindow):
             for ci, key in enumerate(out_keys, 1):
                 if key == '搜索关键词':
                     val = row.get(key, '')
+                elif fmt:
+                    val = fmt(key, row)
                 else:
-                    val = self._format_cell(key, row)
+                    val = str(row.get(key, '') or '')
+                    if key == 'licstate':
+                        val = _code_lookup('licstate', val)
+                    elif key == 'entertype':
+                        val = _code_lookup('entertype', val)
                 ws.cell(ri, ci, val).border = bd
 
         for ci in range(1, len(out_names) + 1):
@@ -576,7 +587,68 @@ class MainWindow(QMainWindow):
             self.btn_export.setEnabled(has_done)
 
 
+def run_cli(keywords):
+    """CLI模式：传入关键词列表，采集后输出合并+分文件xlsx"""
+    print("能源局许可查询器 (CLI)")
+    print("关键词: " + ", ".join(keywords))
+    print()
+
+    results = {}
+    total = len(keywords)
+    for i, kw in enumerate(keywords):
+        print(f"[{i+1}/{total}] 查询: {kw}")
+        try:
+            data = do_search(kw)
+            results[kw] = data
+            print(f"  -> {len(data)} 条")
+        except Exception as e:
+            print(f"  -> 失败: {e}")
+            results[kw] = []
+
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    base = os.path.join(os.path.dirname(os.path.abspath(__file__)), f"export_{ts}")
+    os.makedirs(base, exist_ok=True)
+
+    try:
+        import openpyxl
+        all_data = []
+        for kw in keywords:
+            for row in results.get(kw, []):
+                r = dict(row); r["搜索关键词"] = kw; all_data.append(r)
+        if all_data:
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = "全部数据"
+            MainWindow._write_xlsx_sheet_static(ws, all_data, add_kw_col=True)
+            merge_path = os.path.join(base, f"合并_{ts}.xlsx")
+            wb.save(merge_path)
+            print(f"合并文件: {merge_path}")
+    except ImportError:
+        pass
+
+    sub_dir = os.path.join(base, "分文件")
+    os.makedirs(sub_dir, exist_ok=True)
+    for kw in keywords:
+        data = results.get(kw, [])
+        if data:
+            safe_name = "".join(c if c.isalnum() or c in "_-." else "_" for c in kw)[:50]
+            fpath = os.path.join(sub_dir, f"{safe_name}_{ts}.xlsx")
+            try:
+                wb2 = openpyxl.Workbook()
+                ws2 = wb2.active
+                MainWindow._write_xlsx_sheet_static(ws2, data)
+                wb2.save(fpath)
+            except:
+                pass
+    print(f"分文件目录: {sub_dir}")
+    print(f"完成! 共 {sum(len(v) for v in results.values())} 条记录")
+
+
 def main():
+    if len(sys.argv) > 1:
+        run_cli(sys.argv[1:])
+        return
+
     app = QApplication(sys.argv)
     f_ = QFont("Microsoft YaHei"); f_.setPixelSize(24); app.setFont(f_)
     # 程序图标
