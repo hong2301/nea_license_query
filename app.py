@@ -577,7 +577,7 @@ def main():
     app = QApplication(sys.argv)
     f_ = QFont("Microsoft YaHei"); f_.setPixelSize(24); app.setFont(f_)
     # 程序图标
-    icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'icon.png')
+    icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '能源.svg')
     if os.path.exists(icon_path):
         app.setWindowIcon(QIcon(icon_path))
     w = MainWindow()
