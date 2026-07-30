@@ -111,13 +111,13 @@ class MainWindow(QMainWindow):
             color = fg if fg and fg != '#fff' else bg
             b.setStyleSheet(
                 f"QPushButton{{background:transparent;color:{color};border:none;"
-                f"padding:2px 8px;font-size:12px;}}"
+                f"padding:2px 8px;font-size:13px;}}"
                 f"QPushButton:hover{{text-decoration:underline}}"
             )
             b.setCursor(Qt.PointingHandCursor)
         else:
             p = '8px 20px'
-            fs = 14
+            fs = 15
             mw = 80
             border_style = f'border:1.5px solid {border};' if border else 'border:none;'
             b.setStyleSheet(
@@ -186,7 +186,7 @@ class MainWindow(QMainWindow):
         self.task_table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.task_table.verticalHeader().setVisible(False)
         self.task_table.setShowGrid(True)
-        self.task_table.setStyleSheet("QTableWidget{gridline-color:#e0e0e0;font-size:12px;}")
+        self.task_table.setStyleSheet("QTableWidget{gridline-color:#e0e0e0;}")
         self.task_table.setAlternatingRowColors(True)
         # 居中列头
         for col in range(4):
@@ -554,8 +554,8 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    app.setFont(QFont("Microsoft YaHei", 11))
-    app.setStyleSheet("QTableWidget{font-size:12px;} QHeaderView{font-size:12px;}")
+    app.setFont(QFont("Microsoft YaHei", 12))
+    app.setStyleSheet("QTableWidget{font-size:13px;} QHeaderView{font-size:13px;}")
     w = MainWindow()
     w.show()
     sys.exit(app.exec_())
