@@ -34,7 +34,7 @@ python app.py
 ```
 app.py          — 单文件，GUI (PyQt5) + CLI 双模式
 dict.json       — 编码→中文映射，可热更新
-能源.svg        — 程序图标
+icon.svg        — 程序图标
 ```
 
 ### CLI 模式入口
@@ -161,7 +161,7 @@ return h[:128] + h[-64:] + h[128:-64]    # → C1C3C2
 
 ```bash
 pip install pyinstaller
-pyinstaller --onefile --windowed --name "能源局许可查询器" --add-data "能源.svg;." app.py
+pyinstaller --onefile --windowed --name "能源局许可查询器" --add-data "icon.svg;." app.py
 ```
 
 生成 `dist/能源局许可查询器.exe`，配合 `dict.json` 即可分发。需系统安装 `gmssl` 等 Python 依赖（PyInstaller 会自动打包）。
