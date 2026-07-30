@@ -111,13 +111,13 @@ class MainWindow(QMainWindow):
             color = fg if fg and fg != '#fff' else bg
             b.setStyleSheet(
                 f"QPushButton{{background:transparent;color:{color};border:none;"
-                f"padding:2px 10px;font-size:15px;}}"
+                f"padding:4px 12px;font-size:18px;}}"
                 f"QPushButton:hover{{text-decoration:underline}}"
             )
             b.setCursor(Qt.PointingHandCursor)
         else:
-            p = '10px 28px'
-            fs = 20
+            p = '12px 32px'
+            fs = 24
             mw = 80
             border_style = f'border:1.5px solid {border};' if border else 'border:none;'
             b.setStyleSheet(
@@ -126,7 +126,7 @@ class MainWindow(QMainWindow):
                 f"QPushButton:hover{{opacity:0.85}}"
                 f"QPushButton:disabled{{background:#ccc;color:#888}}"
             )
-            b.setFixedHeight(48)
+            b.setFixedHeight(52)
         return b
 
     def _build(self):
@@ -143,8 +143,8 @@ class MainWindow(QMainWindow):
         self.kw_input = QLineEdit()
         self.kw_input.setPlaceholderText("输入后回车添加")
         self.kw_input.setFixedWidth(200)
-        self.kw_input.setFixedHeight(48)
-        self.kw_input.setStyleSheet("QLineEdit{font-size:14px;padding:4px 10px;}")
+        self.kw_input.setFixedHeight(52)
+        self.kw_input.setStyleSheet("QLineEdit{font-size:18px;padding:6px 12px;}")
         self.kw_input.returnPressed.connect(self.add_keyword)
         bar.addWidget(self.kw_input)
 
@@ -195,7 +195,7 @@ class MainWindow(QMainWindow):
                 item.setTextAlignment(Qt.AlignCenter)
         splitter.addWidget(self.task_table)
         # 设置表格字体
-        tf = QFont("Microsoft YaHei", 16)
+        tf = QFont("Microsoft YaHei", 20)
         self.task_table.setFont(tf)
         self.task_table.horizontalHeader().setFont(tf)
 
@@ -220,7 +220,7 @@ class MainWindow(QMainWindow):
         pv.addWidget(self.data_table)
 
         self.preview_box.setVisible(False)
-        tf2 = QFont("Microsoft YaHei", 16)
+        tf2 = QFont("Microsoft YaHei", 20)
         self.data_table.setFont(tf2)
         self.data_table.horizontalHeader().setFont(tf2)
         splitter.addWidget(self.preview_box)
@@ -408,7 +408,7 @@ class MainWindow(QMainWindow):
                 lo.addWidget(bd)
 
             t.setCellWidget(i, 3, ops)
-            t.setRowHeight(i, 52)
+            t.setRowHeight(i, 56)
 
     # ==================== 预览 ====================
     def view_data(self, kw):
@@ -561,7 +561,7 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    app.setFont(QFont("Microsoft YaHei", 15))
+    app.setFont(QFont("Microsoft YaHei", 18))
     app.setStyleSheet("QTableWidget{font-size:16px;} QTableWidget::item{padding:4px;} QHeaderView{font-size:16px;}")
     w = MainWindow()
     w.show()
