@@ -107,17 +107,15 @@ class MainWindow(QMainWindow):
     def _mk_btn(self, text, bg, fg='#fff', border=None, small=False):
         b = QPushButton(text)
         if small:
-            # 操作列文字按钮：无背景、无边框、纯文字
-            color = fg if fg and fg != '#fff' else bg
             b.setStyleSheet(
                 f"QPushButton{{background:transparent;color:{color};border:none;"
-                f"padding:4px 12px;font-size:18px;}}"
+                f"padding:4px 10px;font-size:16px;}}"
                 f"QPushButton:hover{{text-decoration:underline}}"
             )
             b.setCursor(Qt.PointingHandCursor)
         else:
-            p = '12px 32px'
-            fs = 24
+            p = '10px 28px'
+            fs = 22
             mw = 80
             border_style = f'border:1.5px solid {border};' if border else 'border:none;'
             b.setStyleSheet(
@@ -126,7 +124,7 @@ class MainWindow(QMainWindow):
                 f"QPushButton:hover{{opacity:0.85}}"
                 f"QPushButton:disabled{{background:#ccc;color:#888}}"
             )
-            b.setFixedHeight(52)
+            b.setFixedHeight(46)
         return b
 
     def _build(self):
@@ -143,8 +141,8 @@ class MainWindow(QMainWindow):
         self.kw_input = QLineEdit()
         self.kw_input.setPlaceholderText("输入后回车添加")
         self.kw_input.setFixedWidth(200)
-        self.kw_input.setFixedHeight(52)
-        self.kw_input.setStyleSheet("QLineEdit{font-size:18px;padding:6px 12px;}")
+        self.kw_input.setFixedHeight(46)
+        self.kw_input.setStyleSheet("QLineEdit{font-size:14px;padding:4px 10px;}")
         self.kw_input.returnPressed.connect(self.add_keyword)
         bar.addWidget(self.kw_input)
 
@@ -195,7 +193,7 @@ class MainWindow(QMainWindow):
                 item.setTextAlignment(Qt.AlignCenter)
         splitter.addWidget(self.task_table)
         # 设置表格字体
-        tf = QFont("Microsoft YaHei", 20)
+        tf = QFont("Microsoft YaHei", 16)
         self.task_table.setFont(tf)
         self.task_table.horizontalHeader().setFont(tf)
 
@@ -220,7 +218,7 @@ class MainWindow(QMainWindow):
         pv.addWidget(self.data_table)
 
         self.preview_box.setVisible(False)
-        tf2 = QFont("Microsoft YaHei", 20)
+        tf2 = QFont("Microsoft YaHei", 16)
         self.data_table.setFont(tf2)
         self.data_table.horizontalHeader().setFont(tf2)
         splitter.addWidget(self.preview_box)
@@ -371,16 +369,16 @@ class MainWindow(QMainWindow):
 
             k0 = QTableWidgetItem(kw)
             k0.setTextAlignment(Qt.AlignCenter)
-            k0.setFont(QFont("Microsoft YaHei", 20))
+            k0.setFont(QFont("Microsoft YaHei", 16))
             t.setItem(i, 0, k0)
             si = QTableWidgetItem(STATUS_L.get(st, st))
             si.setForeground(QColor(STATUS_C.get(st, '#000')))
             si.setTextAlignment(Qt.AlignCenter)
-            si.setFont(QFont("Microsoft YaHei", 20))
+            si.setFont(QFont("Microsoft YaHei", 16))
             t.setItem(i, 1, si)
             ci = QTableWidgetItem(cnt_s)
             ci.setTextAlignment(Qt.AlignCenter)
-            ci.setFont(QFont("Microsoft YaHei", 20))
+            ci.setFont(QFont("Microsoft YaHei", 16))
             t.setItem(i, 2, ci)
 
             # 操作按钮
@@ -411,7 +409,7 @@ class MainWindow(QMainWindow):
                 lo.addWidget(bd)
 
             t.setCellWidget(i, 3, ops)
-            t.setRowHeight(i, 56)
+            t.setRowHeight(i, 50)
 
     # ==================== 预览 ====================
     def view_data(self, kw):
@@ -434,7 +432,7 @@ class MainWindow(QMainWindow):
             for ci, (key, _) in enumerate(FIELD_MAP):
                 val = self._format_cell(key, row)
                 item = QTableWidgetItem(val)
-                item.setFont(QFont("Microsoft YaHei", 20))
+                item.setFont(QFont("Microsoft YaHei", 16))
                 item.setTextAlignment(Qt.AlignCenter)
                 dt.setItem(ri, ci, item)
         dt.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -564,7 +562,7 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    app.setFont(QFont("Microsoft YaHei", 18))
+    app.setFont(QFont("Microsoft YaHei", 14))
     w = MainWindow()
     w.show()
     sys.exit(app.exec_())
