@@ -5,6 +5,7 @@
 """
 
 import json, os, sys, time, threading, subprocess
+from datetime import datetime
 import requests
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt, pyqtSignal, QObject
@@ -322,7 +323,10 @@ class MainWindow(QMainWindow):
         if not data: return
         try: import openpyxl
         except ImportError: QMessageBox.critical(self, "错误", "pip install openpyxl"); return
-        path, _ = QFileDialog.getSaveFileName(self, "导出", f"{kw}.xlsx", "Excel (*.xlsx)")
+        default_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'export_{datetime.now().strftime("%Y%m%d_%H%M%S")}')
+        os.makedirs(default_dir, exist_ok=True)
+        default_path = os.path.join(default_dir, f'{kw}.xlsx')
+        path, _ = QFileDialog.getSaveFileName(self, "导出", default_path, "Excel (*.xlsx)")
         if not path: return
         self._write_xlsx(path, data, kw)
         QMessageBox.information(self, "提示", "导出成功")
@@ -439,25 +443,25 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "错误", "pip install openpyxl"); return
 
         wb = openpyxl.Workbook()
-        hf = Font(bold=True, color='FFFFFF', size=11)
-        hfill = PatternFill(start_color='1D9BF0', end_color='1D9BF0', fill_type='solid')
-        halign = Alignment(horizontal='center', vertical='center')
-        bd = Border(left=Side('thin'), right=Side('thin'), top=Side('thin'), bottom=Side('thin'))
 
         if clicked == merge_btn:
-            ws = wb.active; ws.title = '全部数据'
-            all_data = []
-            for k in done:
-                for row in self.tasks[k]['data']:
-                    r = dict(row); r['搜索关键词'] = k; all_data.append(r)
-            self._write_xlsx_sheet(ws, all_data, add_kw_col=True)
-            name = '资管局数据_导出.xlsx'
-            path, _ = QFileDialog.getSaveFileName(self, "保存", name, "Excel (*.xlsx)")
+            default_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'export_{datetime.now().strftime("%Y%m%d_%H%M%S")}')
+            os.makedirs(default_dir, exist_ok=True)
+            default_path = os.path.join(default_dir, '资管局数据_导出.xlsx')
+            path, _ = QFileDialog.getSaveFileName(self, "保存", default_path, "Excel (*.xlsx)")
             if path:
+                ws = wb.active; ws.title = '全部数据'
+                all_data = []
+                for k in done:
+                    for row in self.tasks[k]['data']:
+                        r = dict(row); r['搜索关键词'] = k; all_data.append(r)
+                self._write_xlsx_sheet(ws, all_data, add_kw_col=True)
                 wb.save(path)
                 QMessageBox.information(self, "提示", f"已导出到:\n{path}")
         else:
-            folder = QFileDialog.getExistingDirectory(self, "选择导出文件夹")
+            default_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), f'export_{datetime.now().strftime("%Y%m%d_%H%M%S")}')
+            os.makedirs(default_dir, exist_ok=True)
+            folder = QFileDialog.getExistingDirectory(self, "选择导出文件夹", default_dir)
             if not folder: return
             count = 0
             for k in done:
