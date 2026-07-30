@@ -110,18 +110,18 @@ class MainWindow(QMainWindow):
             color = fg if fg and fg != '#fff' else bg
             b.setStyleSheet(
                 f"QPushButton{{background:transparent;color:{color};border:none;"
-                f"padding:3px 8px;font-size:16px;}}"
+                f"padding:3px 8px;font-size:24px;}}"
                 f"QPushButton:hover{{text-decoration:underline}}"
             )
             b.setCursor(Qt.PointingHandCursor)
         else:
             b.setStyleSheet(
                 f"QPushButton{{background:{bg};color:{fg};border:none;"
-                f"padding:10px 24px;border-radius:5px;font-weight:600;font-size:20px;min-width:80px}}"
+                f"padding:10px 24px;border-radius:5px;font-weight:600;font-size:30px;min-width:80px}}"
                 f"QPushButton:hover{{opacity:0.85}}"
                 f"QPushButton:disabled{{background:#ccc;color:#888}}"
             )
-            b.setFixedHeight(44)
+            b.setFixedHeight(66)
         return b
 
     def _build(self):
@@ -135,12 +135,12 @@ class MainWindow(QMainWindow):
         bar = QHBoxLayout()
         bar.setSpacing(8)
         bar.addWidget(QLabel("关键词"))
-        bar.itemAt(0).widget().setStyleSheet("font-size:20px;")
+        bar.itemAt(0).widget().setStyleSheet("font-size:30px;")
         self.kw_input = QLineEdit()
         self.kw_input.setPlaceholderText("输入后回车添加")
-        self.kw_input.setFixedWidth(200)
-        self.kw_input.setFixedHeight(42)
-        self.kw_input.setStyleSheet("QLineEdit{font-size:20px;padding:4px 10px;}")
+        self.kw_input.setFixedWidth(400)
+        self.kw_input.setFixedHeight(60)
+        self.kw_input.setStyleSheet("QLineEdit{font-size:30px;padding:4px 10px;}")
         self.kw_input.returnPressed.connect(self.add_keyword)
         bar.addWidget(self.kw_input)
 
@@ -191,7 +191,7 @@ class MainWindow(QMainWindow):
                 item.setTextAlignment(Qt.AlignCenter)
         splitter.addWidget(self.task_table)
         # 设置表格字体
-        tf = QFont("Microsoft YaHei"); tf.setPixelSize(16)
+        tf = QFont("Microsoft YaHei"); tf.setPixelSize(24)
         self.task_table.setFont(tf)
         self.task_table.horizontalHeader().setFont(tf)
 
@@ -216,7 +216,7 @@ class MainWindow(QMainWindow):
         pv.addWidget(self.data_table)
 
         self.preview_box.setVisible(False)
-        tf2 = QFont("Microsoft YaHei"); tf2.setPixelSize(16)
+        tf2 = QFont("Microsoft YaHei"); tf2.setPixelSize(24)
         self.data_table.setFont(tf2)
         self.data_table.horizontalHeader().setFont(tf2)
         splitter.addWidget(self.preview_box)
@@ -224,16 +224,28 @@ class MainWindow(QMainWindow):
 
     # ==================== 关键词 ====================
     def add_keyword(self):
-        kw = self.kw_input.text().strip()
-        if not kw: return
-        if kw in self.keywords:
-            QMessageBox.warning(self, "提示", "关键词已存在")
+        raw = self.kw_input.text().strip()
+        if not raw: return
+        # 支持任意分隔符切分：空格、逗号、顿号、分号等
+        import re
+        parts = re.split(r'[\s,，、;；]+', raw)
+        parts = [p.strip() for p in parts if p.strip()]
+        if not parts:
+            QMessageBox.warning(self, "提示", "输入错误")
             return
-        self.keywords.append(kw)
-        self.tasks[kw] = {'status': 'pending', 'count': 0, 'data': None, 'error': None}
+        added = 0
+        for kw in parts:
+            if kw in self.keywords:
+                continue
+            self.keywords.append(kw)
+            self.tasks[kw] = {'status': 'pending', 'count': 0, 'data': None, 'error': None}
+            added += 1
         self.kw_input.clear()
-        self._render()
-        self._update_buttons()
+        if added == 0 and parts:
+            QMessageBox.warning(self, "提示", "关键词已存在")
+        else:
+            self._render()
+            self._update_buttons()
 
     def clear_all(self):
         if self.collecting:
@@ -367,16 +379,16 @@ class MainWindow(QMainWindow):
 
             k0 = QTableWidgetItem(kw)
             k0.setTextAlignment(Qt.AlignCenter)
-            f_ = QFont("Microsoft YaHei"); f_.setPixelSize(16); k0.setFont(f_)
+            f_ = QFont("Microsoft YaHei"); f_.setPixelSize(24); k0.setFont(f_)
             t.setItem(i, 0, k0)
             si = QTableWidgetItem(STATUS_L.get(st, st))
             si.setForeground(QColor(STATUS_C.get(st, '#000')))
             si.setTextAlignment(Qt.AlignCenter)
-            f_ = QFont("Microsoft YaHei"); f_.setPixelSize(16); si.setFont(f_)
+            f_ = QFont("Microsoft YaHei"); f_.setPixelSize(24); si.setFont(f_)
             t.setItem(i, 1, si)
             ci = QTableWidgetItem(cnt_s)
             ci.setTextAlignment(Qt.AlignCenter)
-            f_ = QFont("Microsoft YaHei"); f_.setPixelSize(16); ci.setFont(f_)
+            f_ = QFont("Microsoft YaHei"); f_.setPixelSize(24); ci.setFont(f_)
             t.setItem(i, 2, ci)
 
             # 操作按钮
@@ -407,7 +419,7 @@ class MainWindow(QMainWindow):
                 lo.addWidget(bd)
 
             t.setCellWidget(i, 3, ops)
-            t.setRowHeight(i, 48)
+            t.setRowHeight(i, 66)
 
     # ==================== 预览 ====================
     def view_data(self, kw):
@@ -430,7 +442,7 @@ class MainWindow(QMainWindow):
             for ci, (key, _) in enumerate(FIELD_MAP):
                 val = self._format_cell(key, row)
                 item = QTableWidgetItem(val)
-                f_ = QFont("Microsoft YaHei"); f_.setPixelSize(16); item.setFont(f_)
+                f_ = QFont("Microsoft YaHei"); f_.setPixelSize(24); item.setFont(f_)
                 item.setTextAlignment(Qt.AlignCenter)
                 dt.setItem(ri, ci, item)
         dt.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -560,7 +572,7 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    f_ = QFont("Microsoft YaHei"); f_.setPixelSize(16); app.setFont(f_)
+    f_ = QFont("Microsoft YaHei"); f_.setPixelSize(24); app.setFont(f_)
     w = MainWindow()
     w.show()
     sys.exit(app.exec_())
