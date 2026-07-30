@@ -185,8 +185,8 @@ class MainWindow(QMainWindow):
         self.task_table.setSelectionMode(QTableWidget.NoSelection)
         self.task_table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.task_table.verticalHeader().setVisible(False)
-        self.task_table.setShowGrid(False)
-        self.task_table.setStyleSheet("QTableWidget{gridline-color:#e5e7eb;}")
+        self.task_table.setShowGrid(True)
+        self.task_table.setStyleSheet("QTableWidget{gridline-color:#e0e0e0;font-size:12px;}")
         self.task_table.setAlternatingRowColors(True)
         # 居中列头
         for col in range(4):
@@ -211,8 +211,8 @@ class MainWindow(QMainWindow):
         self.data_table.setAlternatingRowColors(True)
         self.data_table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.data_table.verticalHeader().setVisible(False)
-        self.data_table.setShowGrid(False)
-        self.data_table.setStyleSheet("QTableWidget{gridline-color:#e5e7eb;}")
+        self.data_table.setShowGrid(True)
+        self.data_table.setStyleSheet("QTableWidget{gridline-color:#e0e0e0;}")
         pv.addWidget(self.data_table)
 
         self.preview_box.setVisible(False)
