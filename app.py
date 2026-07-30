@@ -107,21 +107,26 @@ class MainWindow(QMainWindow):
     def _mk_btn(self, text, bg, fg='#fff', border=None, small=False):
         b = QPushButton(text)
         if small:
-            p = '4px 12px'
-            fs = 12
-            mw = 56
+            # 操作列文字按钮：无背景、无边框、纯文字
+            color = fg if fg and fg != '#fff' else bg
+            b.setStyleSheet(
+                f"QPushButton{{background:transparent;color:{color};border:none;"
+                f"padding:2px 8px;font-size:12px;}}"
+                f"QPushButton:hover{{text-decoration:underline}}"
+            )
+            b.setCursor(Qt.PointingHandCursor)
         else:
             p = '8px 20px'
             fs = 14
             mw = 80
-        border_style = f'border:1.5px solid {border};' if border else 'border:none;'
-        b.setStyleSheet(
-            f"QPushButton{{background:{bg};color:{fg};{border_style}"
-            f"padding:{p};border-radius:5px;font-weight:600;font-size:{fs}px;min-width:{mw}px}}"
-            f"QPushButton:hover{{opacity:0.85}}"
-            f"QPushButton:disabled{{background:#ccc;color:#888}}"
-        )
-        b.setFixedHeight(36 if small else 40)
+            border_style = f'border:1.5px solid {border};' if border else 'border:none;'
+            b.setStyleSheet(
+                f"QPushButton{{background:{bg};color:{fg};{border_style}"
+                f"padding:{p};border-radius:5px;font-weight:600;font-size:{fs}px;min-width:{mw}px}}"
+                f"QPushButton:hover{{opacity:0.85}}"
+                f"QPushButton:disabled{{background:#ccc;color:#888}}"
+            )
+            b.setFixedHeight(40)
         return b
 
     def _build(self):
