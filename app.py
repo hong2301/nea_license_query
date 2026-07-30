@@ -606,7 +606,9 @@ def run_cli(keywords):
             results[kw] = []
 
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    base = os.path.join(os.path.dirname(os.path.abspath(__file__)), f"export_{ts}")
+    # CLI模式输出到exe/脚本所在目录
+    base_dir = os.path.dirname(sys.executable) if getattr(sys, "frozen", False) else os.path.dirname(os.path.abspath(__file__))
+    base = os.path.join(base_dir, f"export_{ts}")
     os.makedirs(base, exist_ok=True)
 
     try:
