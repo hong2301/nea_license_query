@@ -52,13 +52,22 @@ def _code_lookup(category, code):
     return m.get(s, s)
 
 
+# SM2 加密（纯 Python，无需 Node.js）
+try:
+    from gmssl import sm2 as _sm2
+    _HAS_GMSSL = True
+except ImportError:
+    _HAS_GMSSL = False
+
 def encrypt(data: str) -> str:
-    d = os.path.dirname(os.path.abspath(__file__))
-    h = os.path.join(d, '_sm2_encrypt.js')
-    p = json.dumps({'key': SM2_PUBLIC_KEY, 'data': data})
-    r = subprocess.run(['node', h], input=p, capture_output=True, text=True, timeout=10, cwd=d)
-    if r.returncode != 0: raise RuntimeError(f"SM2: {r.stderr}")
-    return r.stdout.strip()
+    """SM2 加密，输出兼容 sm-crypto C1C3C2 格式"""
+    if not _HAS_GMSSL:
+        raise RuntimeError('请先 pip install gmssl')
+    sm = _sm2.CryptSM2(public_key=SM2_PUBLIC_KEY, private_key='')
+    raw = sm.encrypt(data.encode())
+    h = raw.hex()
+    # gmssl(C1C2C3) → sm-crypto(C1C3C2)
+    return h[:128] + h[-64:] + h[128:-64]
 
 
 def do_search(keyword: str) -> list:
