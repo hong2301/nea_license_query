@@ -85,7 +85,7 @@ sigs = Sigs()
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("资管局数据采集器")
+        self.setWindowTitle("能源局许可查询器")
         self.setGeometry(100, 100, 1150, 750)
         self.setMinimumSize(900, 500)
 
@@ -110,22 +110,18 @@ class MainWindow(QMainWindow):
             color = fg if fg and fg != '#fff' else bg
             b.setStyleSheet(
                 f"QPushButton{{background:transparent;color:{color};border:none;"
-                f"padding:4px 10px;font-size:16px;}}"
+                f"padding:3px 8px;font-size:16px;}}"
                 f"QPushButton:hover{{text-decoration:underline}}"
             )
             b.setCursor(Qt.PointingHandCursor)
         else:
-            p = '10px 28px'
-            fs = 22
-            mw = 80
-            border_style = f'border:1.5px solid {border};' if border else 'border:none;'
             b.setStyleSheet(
-                f"QPushButton{{background:{bg};color:{fg};{border_style}"
-                f"padding:{p};border-radius:5px;font-weight:600;font-size:{fs}px;min-width:{mw}px}}"
+                f"QPushButton{{background:{bg};color:{fg};border:none;"
+                f"padding:10px 24px;border-radius:5px;font-weight:600;font-size:20px;min-width:80px}}"
                 f"QPushButton:hover{{opacity:0.85}}"
                 f"QPushButton:disabled{{background:#ccc;color:#888}}"
             )
-            b.setFixedHeight(46)
+            b.setFixedHeight(44)
         return b
 
     def _build(self):
@@ -139,11 +135,12 @@ class MainWindow(QMainWindow):
         bar = QHBoxLayout()
         bar.setSpacing(8)
         bar.addWidget(QLabel("关键词"))
+        bar.itemAt(0).widget().setStyleSheet("font-size:20px;")
         self.kw_input = QLineEdit()
         self.kw_input.setPlaceholderText("输入后回车添加")
         self.kw_input.setFixedWidth(200)
-        self.kw_input.setFixedHeight(46)
-        self.kw_input.setStyleSheet("QLineEdit{font-size:14px;padding:4px 10px;}")
+        self.kw_input.setFixedHeight(42)
+        self.kw_input.setStyleSheet("QLineEdit{font-size:20px;padding:4px 10px;}")
         self.kw_input.returnPressed.connect(self.add_keyword)
         bar.addWidget(self.kw_input)
 
@@ -410,7 +407,7 @@ class MainWindow(QMainWindow):
                 lo.addWidget(bd)
 
             t.setCellWidget(i, 3, ops)
-            t.setRowHeight(i, 50)
+            t.setRowHeight(i, 48)
 
     # ==================== 预览 ====================
     def view_data(self, kw):
@@ -563,7 +560,7 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    f_ = QFont("Microsoft YaHei"); f_.setPixelSize(14); app.setFont(f_)
+    f_ = QFont("Microsoft YaHei"); f_.setPixelSize(16); app.setFont(f_)
     w = MainWindow()
     w.show()
     sys.exit(app.exec_())
