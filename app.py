@@ -371,13 +371,16 @@ class MainWindow(QMainWindow):
 
             k0 = QTableWidgetItem(kw)
             k0.setTextAlignment(Qt.AlignCenter)
+            k0.setFont(QFont("Microsoft YaHei", 20))
             t.setItem(i, 0, k0)
             si = QTableWidgetItem(STATUS_L.get(st, st))
             si.setForeground(QColor(STATUS_C.get(st, '#000')))
             si.setTextAlignment(Qt.AlignCenter)
+            si.setFont(QFont("Microsoft YaHei", 20))
             t.setItem(i, 1, si)
             ci = QTableWidgetItem(cnt_s)
             ci.setTextAlignment(Qt.AlignCenter)
+            ci.setFont(QFont("Microsoft YaHei", 20))
             t.setItem(i, 2, ci)
 
             # 操作按钮
@@ -430,11 +433,11 @@ class MainWindow(QMainWindow):
         for ri, row in enumerate(data[:500]):
             for ci, (key, _) in enumerate(FIELD_MAP):
                 val = self._format_cell(key, row)
-                dt.setItem(ri, ci, QTableWidgetItem(val))
+                item = QTableWidgetItem(val)
+                item.setFont(QFont("Microsoft YaHei", 20))
+                item.setTextAlignment(Qt.AlignCenter)
+                dt.setItem(ri, ci, item)
         dt.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        for ri in range(min(len(data), 500)):
-            for ci in range(len(FIELD_NAMES)):
-                dt.item(ri, ci).setTextAlignment(Qt.AlignCenter)
         if len(data) > 500:
             dt.setRowCount(501)
             dt.setItem(500, 0, QTableWidgetItem(f'... 仅显示前 500 条，共 {len(data):,} 条'))
@@ -562,7 +565,6 @@ class MainWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     app.setFont(QFont("Microsoft YaHei", 18))
-    app.setStyleSheet("QTableWidget{font-size:16px;} QTableWidget::item{padding:4px;} QHeaderView{font-size:16px;}")
     w = MainWindow()
     w.show()
     sys.exit(app.exec_())
