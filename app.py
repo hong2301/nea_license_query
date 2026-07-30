@@ -195,7 +195,7 @@ class MainWindow(QMainWindow):
                 item.setTextAlignment(Qt.AlignCenter)
         splitter.addWidget(self.task_table)
         # 设置表格字体
-        tf = QFont("Microsoft YaHei", 15)
+        tf = QFont("Microsoft YaHei", 16)
         self.task_table.setFont(tf)
         self.task_table.horizontalHeader().setFont(tf)
 
@@ -220,7 +220,7 @@ class MainWindow(QMainWindow):
         pv.addWidget(self.data_table)
 
         self.preview_box.setVisible(False)
-        tf2 = QFont("Microsoft YaHei", 15)
+        tf2 = QFont("Microsoft YaHei", 16)
         self.data_table.setFont(tf2)
         self.data_table.horizontalHeader().setFont(tf2)
         splitter.addWidget(self.preview_box)
@@ -408,7 +408,7 @@ class MainWindow(QMainWindow):
                 lo.addWidget(bd)
 
             t.setCellWidget(i, 3, ops)
-            t.setRowHeight(i, 48)
+            t.setRowHeight(i, 52)
 
     # ==================== 预览 ====================
     def view_data(self, kw):
@@ -561,8 +561,8 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    app.setFont(QFont("Microsoft YaHei", 14))
-    app.setStyleSheet("QTableWidget{font-size:15px;} QTableWidget::item{padding:4px;} QHeaderView{font-size:15px;}")
+    app.setFont(QFont("Microsoft YaHei", 15))
+    app.setStyleSheet("QTableWidget{font-size:16px;} QTableWidget::item{padding:4px;} QHeaderView{font-size:16px;}")
     w = MainWindow()
     w.show()
     sys.exit(app.exec_())
