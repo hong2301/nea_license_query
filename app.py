@@ -26,9 +26,6 @@ FIELD_MAP = [
     ('licstate',        '许可证书状态'),
     ('socialcreditno',  '统一社会信用代码'),
     ('entertype',       '许可证类别'),
-    ('csgrade',         '承试等级'),
-    ('cxgrade',         '承修等级'),
-    ('czgrade',         '承装等级'),
     ('licenceno',       '许可证编号'),
     ('licencedate',     '许可证核发日期'),
     ('licvalidstart',   '有效起始日期'),
@@ -511,16 +508,13 @@ class MainWindow(QMainWindow):
     def _update_buttons(self):
         if self.collecting:
             self.btn_start.setText("采集中...")
-            self.btn_start.setEnabled(False)
             self.btn_add.setEnabled(False)
             self.btn_clear.setEnabled(False)
             self.kw_input.setEnabled(False)
             self.btn_export.setEnabled(False)
         else:
-            has_pending = any(self.tasks.get(k, {}).get('status') in ('pending', 'failed') for k in self.keywords)
             has_done = any(self.tasks.get(k, {}).get('status') == 'done' for k in self.keywords)
             self.btn_start.setText("▶ 采集")
-            self.btn_start.setEnabled(has_pending)
             self.btn_add.setEnabled(True)
             self.btn_clear.setEnabled(True)
             self.kw_input.setEnabled(True)
