@@ -452,18 +452,20 @@ class MainWindow(QMainWindow):
                     r = dict(row); r['搜索关键词'] = k; all_data.append(r)
             self._write_xlsx_sheet(ws, all_data, add_kw_col=True)
             name = '资管局数据_导出.xlsx'
+            path, _ = QFileDialog.getSaveFileName(self, "保存", name, "Excel (*.xlsx)")
+            if path:
+                wb.save(path)
+                QMessageBox.information(self, "提示", f"已导出到:\n{path}")
         else:
+            folder = QFileDialog.getExistingDirectory(self, "选择导出文件夹")
+            if not folder: return
+            count = 0
             for k in done:
-                ws = wb.create_sheet(title=k[:31])
-                self._write_xlsx_sheet(ws, self.tasks[k]['data'])
-            if 'Sheet' in wb.sheetnames and len(wb.sheetnames) > 1:
-                del wb['Sheet']
-            name = '资管局数据_分文件导出.xlsx'
-
-        path, _ = QFileDialog.getSaveFileName(self, "保存", name, "Excel (*.xlsx)")
-        if path:
-            wb.save(path)
-            QMessageBox.information(self, "提示", f"已导出到:\n{path}")
+                safe_name = k.replace('/', '_').replace('\\', '_').replace(':', '_')[:50]
+                fpath = os.path.join(folder, f'{safe_name}.xlsx')
+                self._write_xlsx(fpath, self.tasks[k]['data'])
+                count += 1
+            QMessageBox.information(self, "提示", f"已导出 {count} 个文件到:\n{folder}")
 
     def _write_xlsx(self, path, data, kw=''):
         """写入 xlsx 文件"""
