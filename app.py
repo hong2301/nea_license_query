@@ -9,7 +9,7 @@ from datetime import datetime
 import requests
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt, pyqtSignal, QObject
-from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtGui import QFont, QColor, QPixmap, QIcon
 
 # ==================== 配置 ====================
 BASE_URL = "https://zzxy.nea.gov.cn/public/login-service/login/xkgsNew"
