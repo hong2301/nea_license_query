@@ -91,7 +91,7 @@ class MainWindow(QMainWindow):
         self.keywords = []
         self.tasks = {}
         self.collecting = False
-        self.paused = False
+        self._cancel = False
         self.current_view = None
 
         # 连接信号
@@ -242,14 +242,18 @@ class MainWindow(QMainWindow):
     # ==================== 采集 ====================
     def toggle_collect(self):
         if self.collecting:
-            return  # 采集中不可点击
+            # 采集中点击 → 取消
+            self._cancel = True
+            self.collecting = False
+            self._update_buttons()
+            return
         pending = [k for k in self.keywords
                    if self.tasks.get(k, {}).get('status') in ('pending', 'failed')]
         if not pending:
             QMessageBox.information(self, "提示", "没有待处理或失败的关键词")
             return
         self.collecting = True
-        self.paused = False
+        self._cancel = False
         self._update_buttons()
         for k in pending:
             self.tasks[k]['status'] = 'pending'
@@ -260,8 +264,8 @@ class MainWindow(QMainWindow):
 
     def _run(self, keywords):
         for kw in keywords:
-            while self.paused:
-                time.sleep(0.3)
+            if self._cancel:
+                break
             sigs.status.emit(kw, 'collecting')
             try:
                 data = do_search(kw)
@@ -285,7 +289,7 @@ class MainWindow(QMainWindow):
         self._render()
 
     def _on_all_done(self):
-        self.collecting = False; self.paused = False
+        self.collecting = False; self._cancel = False
         self._update_buttons()
 
     def _format_cell(self, key, row):
@@ -306,6 +310,7 @@ class MainWindow(QMainWindow):
         if self.collecting: return
         self.tasks[kw] = {'status': 'pending', 'count': 0, 'data': None, 'error': None}
         self.collecting = True
+        self._cancel = False
         self._update_buttons(); self._render()
         threading.Thread(target=self._run, args=([kw],), daemon=True).start()
 
