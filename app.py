@@ -87,8 +87,9 @@ def encrypt(data: str) -> str:
     return h[:128] + h[-64:] + h[128:-64]
 
 
-def do_search(keyword: str) -> list:
-    raw = json.dumps({'entername': keyword, 'socialcreditno': ''}, ensure_ascii=False)
+def _request_api(entername: str) -> list:
+    """单次 API 请求"""
+    raw = json.dumps({'entername': entername, 'socialcreditno': ''}, ensure_ascii=False)
     enc = encrypt(raw)
     resp = requests.post(
         BASE_URL, data={'param': '04' + enc},
@@ -96,6 +97,26 @@ def do_search(keyword: str) -> list:
     )
     data = resp.json().get('data', [])
     return data if isinstance(data, list) else []
+
+
+def do_search(keyword: str) -> list:
+    """
+    核心查询：对关键词和（关键词）各查一次，合并去重后返回。
+    GUI 和 CLI 统一走此函数。
+    """
+    results = []
+    seen = set()
+    for kw in (keyword, f'（{keyword}）'):
+        try:
+            for row in _request_api(kw):
+                # 以 socialcreditno 去重，无则用 enterId，再无则用 entername
+                dedup_key = row.get('socialcreditno') or row.get('enterId') or row.get('entername', kw)
+                if dedup_key not in seen:
+                    seen.add(dedup_key)
+                    results.append(row)
+        except Exception:
+            pass  # 某次请求失败不影响另一次
+    return results
 
 
 # ==================== 信号 ====================
