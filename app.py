@@ -52,6 +52,23 @@ def _code_lookup(category, code):
     return m.get(s, s)
 
 
+def format_cell(key, row):
+    """格式化单元格：编码转中文 + entertype=4 拼等级（GUI/CLI 共用）"""
+    val = row.get(key)
+    if key == 'licstate':
+        return _code_lookup('licstate', val)
+    if key == 'entertype':
+        if str(row.get('entertype', '')) == '4':
+            parts = []
+            for gk, label in [('czgrade', '承装等级'), ('cxgrade', '承修等级'), ('csgrade', '承试等级')]:
+                gv = str(row.get(gk, '') or '')
+                if gv:
+                    parts.append(f'{label}：{gv}')
+            return '、'.join(parts)
+        return _code_lookup('entertype', val)
+    return str(val) if val is not None else ''
+
+
 # SM2 加密（纯 Python，无需 Node.js）
 try:
     from gmssl import sm2 as _sm2
@@ -342,20 +359,7 @@ class MainWindow(QMainWindow):
         self._update_buttons()
 
     def _format_cell(self, key, row):
-        """格式化单元格：编码转中文 + entertype=4 拼等级"""
-        val = row.get(key)
-        if key == 'licstate':
-            return _code_lookup('licstate', val)
-        if key == 'entertype':
-            if str(row.get('entertype', '')) == '4':
-                parts = []
-                for gk, label in [('czgrade', '承装等级'), ('cxgrade', '承修等级'), ('csgrade', '承试等级')]:
-                    gv = str(row.get(gk, '') or '')
-                    if gv:
-                        parts.append(f'{label}：{gv}')
-                return '、'.join(parts)
-            return _code_lookup('entertype', val)
-        return str(val) if val is not None else ''
+        return format_cell(key, row)
 
     def retry_one(self, kw):
         if self.collecting: return
@@ -630,7 +634,7 @@ def run_cli(keywords):
             wb = openpyxl.Workbook()
             ws = wb.active
             ws.title = "全部数据"
-            MainWindow._write_xlsx_sheet_static(ws, all_data, add_kw_col=True)
+            MainWindow._write_xlsx_sheet_static(ws, all_data, add_kw_col=True, fmt=format_cell)
             merge_path = os.path.join(base, f"合并_{ts}.xlsx")
             wb.save(merge_path)
             print(f"合并文件: {merge_path}")
@@ -647,7 +651,7 @@ def run_cli(keywords):
             try:
                 wb2 = openpyxl.Workbook()
                 ws2 = wb2.active
-                MainWindow._write_xlsx_sheet_static(ws2, data)
+                MainWindow._write_xlsx_sheet_static(ws2, data, fmt=format_cell)
                 wb2.save(fpath)
             except:
                 pass
